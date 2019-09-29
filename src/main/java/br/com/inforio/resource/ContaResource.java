@@ -25,7 +25,7 @@ import br.com.inforio.repository.ContaRepository;
 import br.com.inforio.service.ContaService;
 
 @RestController
-@RequestMapping("categorias")
+@RequestMapping("contas")
 public class ContaResource {
 	
 	@Autowired

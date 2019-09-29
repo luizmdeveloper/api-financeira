@@ -11,7 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -28,13 +28,17 @@ public class Transacao {
 	private Long codigo;
 	
 	@NotNull
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "codigo_conta")
 	private Conta conta;
 	
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "codigo_conta_transferencia")
 	private Conta transferencia;
+	
+	@ManyToOne
+	@JoinColumn(name = "codigo_categoria")
+	private Categoria categoria;
 	
 	@NotNull
 	@Column(name="data_emissao")
@@ -47,11 +51,11 @@ public class Transacao {
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	private TipoTransacao tipoTransacao;
+	private TipoTransacao tipo;
 	
 	@NotNull
 	private Boolean conciliado;
-
+	
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -76,6 +80,22 @@ public class Transacao {
 		this.transferencia = transferencia;
 	}
 
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
+
+	public LocalDate getData() {
+		return data;
+	}
+
+	public void setData(LocalDate data) {
+		this.data = data;
+	}
+
 	public BigDecimal getValor() {
 		return valor;
 	}
@@ -92,19 +112,19 @@ public class Transacao {
 		this.observacao = observacao;
 	}
 
-	public TipoTransacao getTipoTransacao() {
-		return tipoTransacao;
+	public TipoTransacao getTipo() {
+		return tipo;
 	}
 
-	public void setTipoTransacao(TipoTransacao tipoTransacao) {
-		this.tipoTransacao = tipoTransacao;
+	public void setTipo(TipoTransacao tipo) {
+		this.tipo = tipo;
 	}
 
-	public Boolean isConciliado() {
+	public Boolean getConciliado() {
 		return conciliado;
 	}
 
-	public void setConciliado(Boolean conciliado) {
+	public void isConciliado(Boolean conciliado) {
 		this.conciliado = conciliado;
 	}
 
@@ -131,5 +151,5 @@ public class Transacao {
 		} else if (!codigo.equals(other.codigo))
 			return false;
 		return true;
-	}	
+	}
 }

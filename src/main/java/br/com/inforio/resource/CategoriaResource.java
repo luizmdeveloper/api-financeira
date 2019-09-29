@@ -66,7 +66,7 @@ public class CategoriaResource {
 	@DeleteMapping("{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void excluir(@PathVariable Long codigo){
-		categoriaRepository.deleteById(codigo);
+		categoriaService.apagar(codigo);
 	}
 
 }

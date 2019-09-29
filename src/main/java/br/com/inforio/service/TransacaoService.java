@@ -16,13 +16,13 @@ public class TransacaoService {
 	private TransacaoRepository transacaoRepository;
 
 	public void apagar(Long codigo) {
-		Transacao transacao = buscarPorCodigo(codigo);
+		Transacao transacao = buscarTransacaoPorCodigo(codigo);
 		transacaoRepository.delete(transacao);
 	}
 	
-	private Transacao buscarPorCodigo(Long codigo) {
+	private Transacao buscarTransacaoPorCodigo(Long codigo) {
 		Optional<Transacao> optionalTrancasao = transacaoRepository.findById(codigo);
-		
+
 		if (!optionalTrancasao.isPresent()) {
 			throw new TransacaoNaoCadastradaException();
 		}

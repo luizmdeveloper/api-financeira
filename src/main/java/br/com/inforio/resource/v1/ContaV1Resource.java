@@ -12,8 +12,8 @@ import br.com.inforio.modelo.Conta;
 import br.com.inforio.repository.ContaRepository;
 
 @RestController
-@RequestMapping(name = "v1/contas")
-public class ContaResource {
+@RequestMapping("v1/contas")
+public class ContaV1Resource {
 	
 	@Autowired
 	private ContaRepository contaRepository;

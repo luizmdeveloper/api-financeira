@@ -12,8 +12,8 @@ import br.com.inforio.modelo.Categoria;
 import br.com.inforio.repository.CategoriaRepository;
 
 @RestController
-@RequestMapping(name = "v1/categorias")
-public class CategoriaResource {
+@RequestMapping("v1/categorias")
+public class CategoriaV1Resource {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;

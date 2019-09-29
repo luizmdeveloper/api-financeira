@@ -19,17 +19,17 @@ public class ContaService {
 	private ContaRepository contaRepository;
 
 	public Conta alterar(Long codigo, @Valid Conta conta) {
-		Conta contaSalva = buscarPorCodigo(codigo);
+		Conta contaSalva = buscarContaPorCodigo(codigo);
 		BeanUtils.copyProperties(conta, contaSalva, "codigo");
 		return contaRepository.save(contaSalva);
 	}
 	
 	public void excluir(Long codigo) {
-		Conta contaExclui = buscarPorCodigo(codigo);
+		Conta contaExclui = buscarContaPorCodigo(codigo);
 		contaRepository.delete(contaExclui);		
 	}
 	
-	private Conta buscarPorCodigo(Long codigo) {
+	private Conta buscarContaPorCodigo(Long codigo) {
 		Optional<Conta> optionalConta = contaRepository.findById(codigo);
 		
 		if (!optionalConta.isPresent()) {

@@ -13,7 +13,7 @@ import br.com.inforio.repository.TransacaoRepository;
 
 @RestController
 @RequestMapping("v1/transacoes")
-public class TransacaoRessource {
+public class TransacaoV1Ressource {
 
 	@Autowired
 	private TransacaoRepository transacaoRepository;	

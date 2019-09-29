@@ -17,7 +17,7 @@ import br.com.inforio.repository.TransacaoRepository;
 import br.com.inforio.service.TransacaoService;
 
 @RestController
-@RequestMapping("trancacoes")
+@RequestMapping("transacoes")
 public class TransacaoResource {
 
 	@Autowired

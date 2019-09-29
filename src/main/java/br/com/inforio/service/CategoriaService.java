@@ -22,12 +22,16 @@ public class CategoriaService {
 		return categoriaRepository.save(categoriaSalva);
 	}
 
+	public void apagar(Long codigo) {
+		Categoria categoria = buscarCategoriaPorCodigo(codigo);
+		categoriaRepository.delete(categoria);
+	}
+	
 	private Categoria buscarCategoriaPorCodigo(Long codigo) {
 		Optional<Categoria> optionalCategoria = categoriaRepository.findById(codigo);
-		if (optionalCategoria.isPresent()) {
+		if (!optionalCategoria.isPresent()) {
 			throw new CategoriaNaoCadastradaException();
 		}
 		return optionalCategoria.get();
-	}
-	
+	}	
 }

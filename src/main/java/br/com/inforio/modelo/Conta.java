@@ -41,7 +41,7 @@ public class Conta {
 		this.nome = nome;
 	}
 
-	public Boolean istBanco() {
+	public Boolean isBanco() {
 		return banco;
 	}
 
