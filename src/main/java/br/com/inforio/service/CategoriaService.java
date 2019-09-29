@@ -19,7 +19,7 @@ public class CategoriaService {
 	public Categoria alterar(Long codigo, Categoria categoria) {
 		Categoria categoriaSalva = buscarCategoriaPorCodigo(codigo);
 		BeanUtils.copyProperties(categoria, categoriaSalva, "codigo");
-		return categoriaSalva;
+		return categoriaRepository.save(categoriaSalva);
 	}
 
 	private Categoria buscarCategoriaPorCodigo(Long codigo) {
