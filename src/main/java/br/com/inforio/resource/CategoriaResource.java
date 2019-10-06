@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.inforio.evento.RecursoCriadoEvent;
 import br.com.inforio.modelo.Categoria;
 import br.com.inforio.repository.CategoriaRepository;
+import br.com.inforio.repository.filter.CategoriaFilter;
 import br.com.inforio.service.CategoriaService;
 
 @RestController
@@ -39,8 +40,8 @@ public class CategoriaResource {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
-	public ResponseEntity<List<Categoria>> buscarTodos(){
-		List<Categoria> categorias = categoriaRepository.findAll();
+	public ResponseEntity<List<Categoria>> buscarTodos(CategoriaFilter filter){
+		List<Categoria> categorias = categoriaRepository.pesquisar(filter);
 		return categorias.size() == 0 ? ResponseEntity.notFound().build() : ResponseEntity.ok(categorias);
 	}
 
