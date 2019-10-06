@@ -11,6 +11,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import br.com.inforio.modelo.Transacao;
@@ -23,18 +26,18 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 	private EntityManager manager;
 		
 	@Override
-	public List<Transacao> pesquisar(TransacaoFilter filter) {
+	public Page<Transacao> pesquisar(TransacaoFilter filter, Pageable page) {
 		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
 		CriteriaQuery<Transacao> criteria = criteriaBuilder.createQuery(Transacao.class);
 		Root<Transacao> root = criteria.from(Transacao.class);
 
 		Predicate[] predicates = criarRestricoes(filter, criteriaBuilder, root); 
 		criteria.where(predicates);
-		
 		TypedQuery<Transacao> query = manager.createQuery(criteria);
-		return query.getResultList();
+		adicionarRestricoesPaginacao(query, page);
+		
+		return new PageImpl<>(query.getResultList(), page, calcularTotal(filter, page));
 	}
-
 
 	private Predicate[] criarRestricoes(TransacaoFilter filter, CriteriaBuilder criteriaBuilder, Root<Transacao> root) {
 		
@@ -64,5 +67,25 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		
 		return predicates.toArray(new Predicate[predicates.size()]);
 	}
+	
+	private void adicionarRestricoesPaginacao(TypedQuery<Transacao> query, Pageable page) {
+		int paginaAtual = page.getPageNumber();
+		int totalRegistroPorPagina = page.getPageSize();
+		int primeiroRegistroDaPagina = paginaAtual * totalRegistroPorPagina;
+		
+		query.setFirstResult(primeiroRegistroDaPagina);
+		query.setMaxResults(totalRegistroPorPagina);
+	}
 
+	private Long calcularTotal(TransacaoFilter filter, Pageable page) {
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+		Root<Transacao> root = criteria.from(Transacao.class);
+		
+		Predicate[] predicates = criarRestricoes(filter, builder, root);
+		criteria.where(predicates);
+		
+		criteria.select(builder.count(root));		
+		return manager.createQuery(criteria).getSingleResult();
+	}
 }

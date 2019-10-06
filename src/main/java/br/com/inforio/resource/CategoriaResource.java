@@ -1,6 +1,5 @@
 package br.com.inforio.resource;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -8,6 +7,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,9 +41,8 @@ public class CategoriaResource {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
-	public ResponseEntity<List<Categoria>> buscarTodos(CategoriaFilter filter){
-		List<Categoria> categorias = categoriaRepository.pesquisar(filter);
-		return categorias.size() == 0 ? ResponseEntity.notFound().build() : ResponseEntity.ok(categorias);
+	public Page<Categoria> buscarTodos(CategoriaFilter filter, Pageable page){
+		return categoriaRepository.pesquisar(filter, page);
 	}
 
 	@GetMapping("{codigo}")

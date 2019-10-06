@@ -11,6 +11,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import br.com.inforio.modelo.Conta;
@@ -23,7 +26,7 @@ public class ContaRepositoryImpl implements ContaRepositoryQuery {
 	private EntityManager manager;
 
 	@Override
-	public List<Conta> pesquisar(ContaFilter filter) {
+	public Page<Conta> pesquisar(ContaFilter filter, Pageable page) {
 		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
 		CriteriaQuery<Conta> criteria = criteriaBuilder.createQuery(Conta.class);
 		Root<Conta> root = criteria.from(Conta.class);
@@ -31,9 +34,10 @@ public class ContaRepositoryImpl implements ContaRepositoryQuery {
 		
 		Predicate[] predicates = criarRestricoes(filter, criteriaBuilder, root); 
 		criteria.where(predicates);
-
 		TypedQuery<Conta> query = manager.createQuery(criteria);
-		return query.getResultList();
+		adicionarRestricoesPaginacao(query, page);
+		
+		return new PageImpl<>(query.getResultList(), page, calcularTotal(filter)) ;
 	}
 
 	private Predicate[] criarRestricoes(ContaFilter filter, CriteriaBuilder criteriaBuilder, Root<Conta> root) {
@@ -47,4 +51,27 @@ public class ContaRepositoryImpl implements ContaRepositoryQuery {
 		
 		return predicates.toArray(new Predicate[predicates.size()]);
 	}
+	
+	private void adicionarRestricoesPaginacao(TypedQuery<Conta> query, Pageable page) {
+		int paginaAtual = page.getPageNumber();
+		int primeiroRegistroDaPagina = page.getPageSize();
+		int totalRegistro = paginaAtual * primeiroRegistroDaPagina;
+		
+		query.setFirstResult(primeiroRegistroDaPagina);
+		query.setMaxResults(totalRegistro);		
+	}
+	
+	private Long calcularTotal(ContaFilter filter) {
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+		Root<Conta> root = criteria.from(Conta.class);
+		
+		Predicate[] predicates = criarRestricoes(filter, builder, root);
+		criteria.where(predicates);
+		criteria.select(builder.count(root));
+		
+		return manager.createQuery(criteria).getSingleResult();
+	}
+
+
 }

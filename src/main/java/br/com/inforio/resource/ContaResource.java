@@ -7,6 +7,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.inforio.evento.RecursoCriadoEvent;
 import br.com.inforio.modelo.Conta;
 import br.com.inforio.repository.ContaRepository;
+import br.com.inforio.repository.filter.ContaFilter;
 import br.com.inforio.service.ContaService;
 
 @RestController
@@ -36,6 +39,11 @@ public class ContaResource {
 	
 	@Autowired
 	private ApplicationEventPublisher publisher;
+	
+	@GetMapping
+	public Page<Conta> buscar(ContaFilter filter, Pageable page){
+		return contaRepository.pesquisar(filter, page);
+	}
 	
 	@GetMapping("{codigo}")
 	public ResponseEntity<Conta> buscarPorCodigo(@PathVariable Long codigo){
