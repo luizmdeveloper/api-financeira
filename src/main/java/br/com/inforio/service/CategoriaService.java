@@ -4,11 +4,13 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import br.com.inforio.modelo.Categoria;
 import br.com.inforio.repository.CategoriaRepository;
 import br.com.inforio.service.exception.CategoriaNaoCadastradaException;
+import br.com.inforio.service.exception.CategoriaNaoPodeExcluiException;
 
 @Service
 public class CategoriaService {
@@ -24,10 +26,14 @@ public class CategoriaService {
 
 	public void apagar(Long codigo) {
 		Categoria categoria = buscarCategoriaPorCodigo(codigo);
-		categoriaRepository.delete(categoria);
+		try {
+			categoriaRepository.delete(categoria);
+		} catch (DataIntegrityViolationException e) {
+			throw new CategoriaNaoPodeExcluiException();
+		}
 	}
 	
-	private Categoria buscarCategoriaPorCodigo(Long codigo) {
+	public Categoria buscarCategoriaPorCodigo(Long codigo) {
 		Optional<Categoria> optionalCategoria = categoriaRepository.findById(codigo);
 		if (!optionalCategoria.isPresent()) {
 			throw new CategoriaNaoCadastradaException();

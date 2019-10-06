@@ -8,7 +8,6 @@ CREATE TABLE transacoes(
 	codigo BIGINT PRIMARY KEY NOT NULL,
 	codigo_categoria BIGINT NOT NULL,
 	codigo_conta BIGINT NOT NULL,
-	codigo_conta_transferencia BIGINT,
 	data_emissao DATE NOT NULL,
 	valor NUMERIC(15,2) NOT NULL,
 	tipo CHAR(1) NOT NULL,
@@ -16,6 +15,5 @@ CREATE TABLE transacoes(
 	conciliado BOOLEAN NOT NULL,
 	
 	FOREIGN KEY (codigo_categoria) REFERENCES categorias (codigo),
-	FOREIGN KEY (codigo_conta) REFERENCES contas (codigo),
-	FOREIGN KEY (codigo_conta_transferencia) REFERENCES contas (codigo)
+	FOREIGN KEY (codigo_conta) REFERENCES contas (codigo)
 );

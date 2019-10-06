@@ -6,11 +6,13 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import br.com.inforio.modelo.Conta;
 import br.com.inforio.repository.ContaRepository;
 import br.com.inforio.service.exception.ContaNaoCadastradaException;
+import br.com.inforio.service.exception.ContaNaoPodeExcluiException;
 
 @Service
 public class ContaService {
@@ -26,10 +28,15 @@ public class ContaService {
 	
 	public void excluir(Long codigo) {
 		Conta contaExclui = buscarContaPorCodigo(codigo);
-		contaRepository.delete(contaExclui);		
+		try {
+			contaRepository.delete(contaExclui);			
+		} catch (DataIntegrityViolationException e) {
+			throw new ContaNaoPodeExcluiException();
+		}
+		
 	}
 	
-	private Conta buscarContaPorCodigo(Long codigo) {
+	public Conta buscarContaPorCodigo(Long codigo) {
 		Optional<Conta> optionalConta = contaRepository.findById(codigo);
 		
 		if (!optionalConta.isPresent()) {

@@ -1,0 +1,14 @@
+CREATE SEQUENCE sequence_usuarios
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807;
+    
+CREATE TABLE usuarios(
+	codigo BIGINT PRIMARY KEY NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	senha VARCHAR(100) NOT NULL,
+	codigo_perfil BIGINT NOT NULL,
+	
+	FOREIGN KEY (codigo_perfil) REFERENCES perfis (codigo)
+);

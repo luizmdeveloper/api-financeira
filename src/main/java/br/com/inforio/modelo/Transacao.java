@@ -33,10 +33,6 @@ public class Transacao {
 	private Conta conta;
 	
 	@ManyToOne
-	@JoinColumn(name = "codigo_conta_transferencia")
-	private Conta transferencia;
-	
-	@ManyToOne
 	@JoinColumn(name = "codigo_categoria")
 	private Categoria categoria;
 	
@@ -70,14 +66,6 @@ public class Transacao {
 
 	public void setConta(Conta conta) {
 		this.conta = conta;
-	}
-
-	public Conta getTransferencia() {
-		return transferencia;
-	}
-
-	public void setTransferencia(Conta transferencia) {
-		this.transferencia = transferencia;
 	}
 
 	public Categoria getCategoria() {
@@ -124,7 +112,7 @@ public class Transacao {
 		return conciliado;
 	}
 
-	public void isConciliado(Boolean conciliado) {
+	public void setConciliado(Boolean conciliado) {
 		this.conciliado = conciliado;
 	}
 
