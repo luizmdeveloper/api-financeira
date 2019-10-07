@@ -23,9 +23,7 @@ import br.com.inforio.service.exception.CategoriaNaoPodeExcluiException;
 import br.com.inforio.service.exception.ContaNaoCadastradaException;
 import br.com.inforio.service.exception.ContaNaoPodeExcluiException;
 import br.com.inforio.service.exception.TransacaoNaoCadastradaException;
-import br.com.inforio.service.exception.TransacaoNaoEhTransaferenciaInformadoContaTransaferenciaException;
 import br.com.inforio.service.exception.TransacaoNaoPodeExcluiException;
-import br.com.inforio.service.exception.TransacaoTransaferenciaEContaTransaferenciaNaoInformadaException;
 
 @ControllerAdvice
 public class ApiFinanceiraExceptionHandler extends ResponseEntityExceptionHandler {
@@ -54,24 +52,6 @@ public class ApiFinanceiraExceptionHandler extends ResponseEntityExceptionHandle
 	@ExceptionHandler({ TransacaoNaoCadastradaException.class })
 	public ResponseEntity<Object> handleTransacaoNaoCadastradaException(TransacaoNaoCadastradaException ex, WebRequest request){
 		String mensagemUsuario = "Transação não cadastrada!";
-		String mensagemDesenvolvedor =  ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
-		
-		return ResponseEntity.badRequest().body(erros);
-	}
-	
-	@ExceptionHandler({ TransacaoTransaferenciaEContaTransaferenciaNaoInformadaException.class })
-	public ResponseEntity<Object> handleTransacaoTransaferenciaEContaTransaferenciaNaoInformadaException(TransacaoTransaferenciaEContaTransaferenciaNaoInformadaException ex, WebRequest request){
-		String mensagemUsuario = "Transação é transaferência mas, não informado a conta trânsferência!";
-		String mensagemDesenvolvedor =  ex.toString();
-		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
-		
-		return ResponseEntity.badRequest().body(erros);
-	}
-		
-	@ExceptionHandler({ TransacaoNaoEhTransaferenciaInformadoContaTransaferenciaException.class })
-	public ResponseEntity<Object> handleTransacaoNaoEhTransaferenciaInformadoContaTransaferenciaException(TransacaoNaoEhTransaferenciaInformadoContaTransaferenciaException ex, WebRequest request){
-		String mensagemUsuario = "Transação não é transaferência mas, informado a conta trânsferência!";
 		String mensagemDesenvolvedor =  ex.toString();
 		List<Erro> erros = Arrays.asList(new Erro(mensagemUsuario, mensagemDesenvolvedor));
 		

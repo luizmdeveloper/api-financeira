@@ -3,6 +3,7 @@ package br.com.inforio.modelo;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,7 +28,7 @@ public class Perfil {
 	@NotNull
 	private String nome;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "perfil_autorizacoes",
 			   joinColumns = @JoinColumn(name = "codigo_perfil"),
 			   inverseJoinColumns = @JoinColumn(name = "codigo_autorizacao"))	
