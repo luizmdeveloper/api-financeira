@@ -1,7 +1,5 @@
 package br.com.inforio.resource;
 
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -11,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,17 +40,20 @@ public class TransacaoResource {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_TRANSACAO') and #oauth2.hasScope('read')")
 	public Page<Transacao> pesquisar(TransacaoFilter filter, Pageable page){
 		return transacaoRepository.pesquisar(filter, page);
 	}
 	
 	@GetMapping("{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_TRANSACAO') and #oauth2.hasScope('read')")
 	public ResponseEntity<Transacao> buscarPorCodigo(@PathVariable Long codigo){
-		Optional<Transacao> optionalTransacao = transacaoRepository.findById(codigo);
-		return optionalTransacao.isPresent() ? ResponseEntity.ok(optionalTransacao.get()) : ResponseEntity.notFound().build();
+		Transacao transacao = transacaoRepository.findOne(codigo);
+		return transacao != null ? ResponseEntity.ok(transacao) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('ROLE_SALVAR_TRANSACAO') and #oauth2.hasScope('write')")
 	public ResponseEntity<?> salvar(@Valid @RequestBody Transacao transacao, HttpServletResponse response){
 		Transacao transacaoSalva =  transacaoService.salvar(transacao);
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, transacaoSalva.getCodigo()));
@@ -59,6 +61,7 @@ public class TransacaoResource {
 	}
 
 	@PutMapping("{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_SALVAR_TRANSACAO') and #oauth2.hasScope('write')")
 	public ResponseEntity<?> alterar(@PathVariable Long codigo, @Valid @RequestBody Transacao transacao){
 		Transacao transacaoSalva = transacaoService.alterar(codigo, transacao);
 		return ResponseEntity.ok(transacaoSalva);
@@ -66,12 +69,14 @@ public class TransacaoResource {
 	
 	@PutMapping("/{codigo}/conciliado")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasAuthority('ROLE_SALVAR_TRANSACAO') and #oauth2.hasScope('write')")
 	public void atuaizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean ativo){		
 		transacaoService.atualizarTransacaoConciliado(codigo, ativo);
 	}
 	
 	@DeleteMapping("{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasAuthority('ROLE_EXCLUIR_TRANSACAO') and #oauth2.hasScope('write')")
 	public void apagar(@PathVariable Long codigo) {
 		transacaoService.apagar(codigo);
 	}

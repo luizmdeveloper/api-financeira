@@ -22,6 +22,8 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator="sequence_perfis")				
 	private Long codigo;
 	
+	@NotNull
+	private String nome;
 	
 	@NotNull
 	private String email;
@@ -39,6 +41,14 @@ public class Usuario {
 
 	public void setCodigo(Long codigo) {
 		this.codigo = codigo;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 	public String getEmail() {

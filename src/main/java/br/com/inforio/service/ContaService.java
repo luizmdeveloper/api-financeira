@@ -1,7 +1,5 @@
 package br.com.inforio.service;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -33,16 +31,14 @@ public class ContaService {
 		} catch (DataIntegrityViolationException e) {
 			throw new ContaNaoPodeExcluiException();
 		}
-		
 	}
 	
 	public Conta buscarContaPorCodigo(Long codigo) {
-		Optional<Conta> optionalConta = contaRepository.findById(codigo);
-		
-		if (!optionalConta.isPresent()) {
+		Conta conta = contaRepository.findOne(codigo);		
+		if (conta == null) {
 			throw new ContaNaoCadastradaException();
 		}
 		
-		return optionalConta.get();
+		return conta;
 	}
 }

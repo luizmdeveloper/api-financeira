@@ -1,7 +1,5 @@
 package br.com.inforio.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,10 +32,10 @@ public class CategoriaService {
 	}
 	
 	public Categoria buscarCategoriaPorCodigo(Long codigo) {
-		Optional<Categoria> optionalCategoria = categoriaRepository.findById(codigo);
-		if (!optionalCategoria.isPresent()) {
+		Categoria categoria = categoriaRepository.findOne(codigo);
+		if (categoria == null) {
 			throw new CategoriaNaoCadastradaException();
 		}
-		return optionalCategoria.get();
+		return categoria;
 	}	
 }

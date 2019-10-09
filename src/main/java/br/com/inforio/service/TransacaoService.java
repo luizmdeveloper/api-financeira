@@ -1,7 +1,5 @@
 package br.com.inforio.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -67,12 +65,10 @@ public class TransacaoService {
 	}
 		
 	private Transacao buscarTransacaoPorCodigo(Long codigo) {
-		Optional<Transacao> optionalTrancasao = transacaoRepository.findById(codigo);
-
-		if (!optionalTrancasao.isPresent()) {
+		Transacao trancasao = transacaoRepository.findOne(codigo);
+		if (trancasao == null) {
 			throw new TransacaoNaoCadastradaException();
 		}
-		
-		return optionalTrancasao.get();
+		return trancasao;
 	}	
 }

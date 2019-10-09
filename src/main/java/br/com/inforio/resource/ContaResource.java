@@ -1,7 +1,5 @@
 package br.com.inforio.resource;
 
-import java.util.Optional;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -11,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,17 +40,20 @@ public class ContaResource {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CONTA') and #oauth2.hasScope('read')")
 	public Page<Conta> buscar(ContaFilter filter, Pageable page){
 		return contaRepository.pesquisar(filter, page);
 	}
 	
 	@GetMapping("{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_CONTA') and #oauth2.hasScope('read')")
 	public ResponseEntity<Conta> buscarPorCodigo(@PathVariable Long codigo){
-		Optional<Conta> optionalConta = contaRepository.findById(codigo); 
-		return optionalConta.isPresent() ? ResponseEntity.ok(optionalConta.get()) : ResponseEntity.notFound().build();
+		Conta conta = contaRepository.findOne(codigo); 
+		return conta != null ? ResponseEntity.ok(conta) : ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('ROLE_SALVAR_CONTA') and #oauth2.hasScope('write')")
 	public ResponseEntity<?> salvar(@Valid @RequestBody Conta conta, HttpServletResponse response){
 		Conta contaSalva =  contaRepository.save(conta);
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, contaSalva.getCodigo()));
@@ -59,6 +61,7 @@ public class ContaResource {
 	}
 	
 	@PutMapping("{codigo}")
+	@PreAuthorize("hasAuthority('ROLE_SALVAR_CONTA') and #oauth2.hasScope('write')")
 	public ResponseEntity<?> alterar(@PathVariable Long codigo, @Valid @RequestBody Conta conta){
 		Conta contaSalva = contaService.alterar(codigo, conta);
 		return ResponseEntity.ok(contaSalva);
@@ -66,6 +69,7 @@ public class ContaResource {
 	
 	@DeleteMapping("{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasAuthority('ROLE_EXCLUIR_CATEGORIA') and #oauth2.hasScope('write')")
 	public void delete(@PathVariable Long codigo) {
 		contaService.excluir(codigo);
 	}

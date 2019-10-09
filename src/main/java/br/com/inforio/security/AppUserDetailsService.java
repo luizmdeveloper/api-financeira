@@ -41,9 +41,8 @@ public class AppUserDetailsService implements UserDetailsService {
 
 	private Collection<? extends GrantedAuthority> getPermissoes(Usuario usuario) {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        Optional<Perfil> optionalPerfil = perfilRepository.findById(usuario.getPerfil().getCodigo());
-        if (optionalPerfil.isPresent()) {
-            Perfil perfil = optionalPerfil.get();
+        Perfil perfil = perfilRepository.findOne(usuario.getPerfil().getCodigo());
+        if (perfil != null) {
             Optional<List<String>> autorizacoes = Optional.ofNullable(perfil.getAutorizacoes()
                                                                       .stream()
                                                                       .map(Autorizacao::getNome)
