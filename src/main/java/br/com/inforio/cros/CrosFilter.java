@@ -35,10 +35,9 @@ public class CrosFilter implements Filter  {
 			response.setHeader("Access-Control-Max-Age", "3600");
 			
 			response.setStatus(HttpServletResponse.SC_OK);
-		}else {
+		} else {
 			chain.doFilter(req, resp);
 		}
-		
 	}
 
 	@Override
@@ -48,5 +47,4 @@ public class CrosFilter implements Filter  {
 	@Override
 	public void destroy() {
 	}
-
 }

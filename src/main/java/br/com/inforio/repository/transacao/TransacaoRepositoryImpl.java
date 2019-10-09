@@ -16,9 +16,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import br.com.inforio.modelo.Categoria_;
+import br.com.inforio.modelo.Conta_;
 import br.com.inforio.modelo.Transacao;
 import br.com.inforio.modelo.Transacao_;
 import br.com.inforio.repository.filter.TransacaoFilter;
+import br.com.inforio.repository.projecao.ResumoTransacao;
 
 public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 
@@ -34,6 +37,28 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		Predicate[] predicates = criarRestricoes(filter, criteriaBuilder, root); 
 		criteria.where(predicates);
 		TypedQuery<Transacao> query = manager.createQuery(criteria);
+		adicionarRestricoesPaginacao(query, page);
+		
+		return new PageImpl<>(query.getResultList(), page, calcularTotal(filter, page));
+	}
+	
+	@Override
+	public Page<ResumoTransacao> pesquisarResumido(TransacaoFilter filter, Pageable page) {
+		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
+		CriteriaQuery<ResumoTransacao> criteriaQuery = criteriaBuilder.createQuery(ResumoTransacao.class);
+		Root<Transacao> root = criteriaQuery.from(Transacao.class);
+		
+		criteriaQuery.select(criteriaBuilder.construct(ResumoTransacao.class, root.get(Transacao_.codigo), 
+																			  root.get(Transacao_.categoria).get(Categoria_.nome),
+																			  root.get(Transacao_.conta).get(Conta_.nome),
+																			  root.get(Transacao_.data),
+																			  root.get(Transacao_.valor),
+																			  root.get(Transacao_.tipo),
+																			  root.get(Transacao_.conciliado)));
+		
+		Predicate[] predicates = criarRestricoes(filter, criteriaBuilder, root); 
+		criteriaQuery.where(predicates);
+		TypedQuery<ResumoTransacao> query = manager.createQuery(criteriaQuery);
 		adicionarRestricoesPaginacao(query, page);
 		
 		return new PageImpl<>(query.getResultList(), page, calcularTotal(filter, page));
@@ -68,7 +93,7 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		return predicates.toArray(new Predicate[predicates.size()]);
 	}
 	
-	private void adicionarRestricoesPaginacao(TypedQuery<Transacao> query, Pageable page) {
+	private void adicionarRestricoesPaginacao(TypedQuery<?> query, Pageable page) {
 		int paginaAtual = page.getPageNumber();
 		int totalRegistroPorPagina = page.getPageSize();
 		int primeiroRegistroDaPagina = paginaAtual * totalRegistroPorPagina;
