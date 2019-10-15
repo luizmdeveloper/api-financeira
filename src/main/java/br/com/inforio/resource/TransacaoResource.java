@@ -77,8 +77,8 @@ public class TransacaoResource {
 	@PutMapping("/{codigo}/conciliado")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@PreAuthorize("hasAuthority('ROLE_SALVAR_TRANSACAO') and #oauth2.hasScope('write')")
-	public void atuaizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean ativo){		
-		transacaoService.atualizarTransacaoConciliado(codigo, ativo);
+	public void atuaizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean conciliado){		
+		transacaoService.atualizarTransacaoConciliado(codigo, conciliado);
 	}
 	
 	@DeleteMapping("{codigo}")
