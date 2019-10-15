@@ -1,5 +1,7 @@
 package br.com.inforio.repository.transacao;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,12 +79,12 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 				predicates.add(criteriaBuilder.equal(root.get(Transacao_.conta), filter.getConta()));
 			}
 			
-			if (filter.getEmissaoDe() != null) {
-				predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Transacao_.data), filter.getEmissaoDe()));
+			if (filter.getEmissaoDe() != null) {				
+				predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(Transacao_.data),  LocalDate.parse(filter.getEmissaoDe(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
 			}
 
-			if (filter.getEmissaoAte() != null) {
-				predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Transacao_.data), filter.getEmissaoAte()));
+			if (filter.getEmissaoAte() != null) {				
+				predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get(Transacao_.data), LocalDate.parse(filter.getEmissaoAte(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
 			}
 			
 			if (!StringUtils.isEmpty(filter.getObservacao())) {

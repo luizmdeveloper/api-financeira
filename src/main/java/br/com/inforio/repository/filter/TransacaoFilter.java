@@ -1,20 +1,11 @@
 package br.com.inforio.repository.filter;
 
-import java.time.LocalDate;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 public class TransacaoFilter {
 	
 	private Long categoria;
 	private Long conta;
-	
-	@DateTimeFormat(pattern="yyyy-MM-DD")
-	private LocalDate emissaoDe;
-	
-	@DateTimeFormat(pattern="yyyy-MM-DD")
-	private LocalDate emissaoAte;
-	
+	private String emissaoDe;
+	private String emissaoAte;
 	private String observacao;
 
 	public Long getCategoria() {
@@ -33,19 +24,19 @@ public class TransacaoFilter {
 		this.conta = conta;
 	}
 
-	public LocalDate getEmissaoDe() {
+	public String getEmissaoDe() {
 		return emissaoDe;
 	}
 
-	public void setEmissaoDe(LocalDate emissaoDe) {
+	public void setEmissaoDe(String emissaoDe) {
 		this.emissaoDe = emissaoDe;
 	}
 
-	public LocalDate getEmissaoAte() {
+	public String getEmissaoAte() {
 		return emissaoAte;
 	}
 
-	public void setEmissaoAte(LocalDate emissaoAte) {
+	public void setEmissaoAte(String emissaoAte) {
 		this.emissaoAte = emissaoAte;
 	}
 
