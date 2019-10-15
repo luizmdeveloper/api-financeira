@@ -37,7 +37,7 @@ public class Transacao {
 	private Categoria categoria;
 	
 	@NotNull
-	@Column(name="data_emissao")
+	@Column(name="data_emissao", columnDefinition = "DATE")
 	private LocalDate data;
 
 	@NotNull

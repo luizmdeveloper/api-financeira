@@ -61,6 +61,7 @@
 		<dependency>
 		    <groupId>org.postgresql</groupId>
 		    <artifactId>postgresql</artifactId>
+		    <scope>runtime</scope>
 		</dependency>
 		
 		<!-- jackson -->
@@ -110,13 +111,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-maven-plugin</artifactId>
-				<configuration>
-					<driver>org.postgresql.Driver</driver>
-				</configuration>
-			</plugin> -->
 		</plugins>
 	</build>
 
