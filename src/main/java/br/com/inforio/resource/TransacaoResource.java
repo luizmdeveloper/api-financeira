@@ -24,6 +24,7 @@ import br.com.inforio.evento.RecursoCriadoEvent;
 import br.com.inforio.modelo.Transacao;
 import br.com.inforio.repository.TransacaoRepository;
 import br.com.inforio.repository.filter.TransacaoFilter;
+import br.com.inforio.repository.projecao.ResumoTransacao;
 import br.com.inforio.service.TransacaoService;
 
 @RestController
@@ -43,6 +44,12 @@ public class TransacaoResource {
 	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_TRANSACAO') and #oauth2.hasScope('read')")
 	public Page<Transacao> pesquisar(TransacaoFilter filter, Pageable page){
 		return transacaoRepository.pesquisar(filter, page);
+	}
+	
+	@GetMapping(params="resumo")
+	@PreAuthorize("hasAuthority('ROLE_PESQUISAR_TRANSACAO') and #oauth2.hasScope('read')")
+	public Page<ResumoTransacao> pesquisarResumo(TransacaoFilter filter, Pageable page){
+		return transacaoRepository.pesquisarResumido(filter, page);
 	}
 	
 	@GetMapping("{codigo}")

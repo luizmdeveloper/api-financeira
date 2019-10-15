@@ -2,13 +2,17 @@ package br.com.inforio.repository.filter;
 
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 public class TransacaoFilter {
 	
 	private Long categoria;
 	private Long conta;
 	
+	@DateTimeFormat(pattern="yyyy-MM-DD")
 	private LocalDate emissaoDe;
 	
+	@DateTimeFormat(pattern="yyyy-MM-DD")
 	private LocalDate emissaoAte;
 	
 	private String observacao;
