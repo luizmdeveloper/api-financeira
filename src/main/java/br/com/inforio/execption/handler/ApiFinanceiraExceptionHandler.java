@@ -95,7 +95,6 @@ public class ApiFinanceiraExceptionHandler extends ResponseEntityExceptionHandle
 		List<Erro> erros = new ArrayList<>();
 		
 		for(FieldError fieldError: bindingResult.getFieldErrors()) {
-			System.out.println(">>>>> fieldError " + messageSource.getMessage(fieldError, LocaleContextHolder.getLocale()));
 			String mensagemErroUsuario = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
 			String mensagemErroDesenvolvedor = fieldError.toString();
 		
