@@ -8,6 +8,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 @Entity
 @Table(name = "contas")
 public class Conta {
@@ -19,7 +21,7 @@ public class Conta {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator="sequence_contas")	
 	private Long codigo;
 	
-	@NotNull
+	@NotBlank
 	private String nome;
 	
 	@NotNull

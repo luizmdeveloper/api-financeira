@@ -6,7 +6,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name="categorias")
@@ -19,7 +20,7 @@ public class Categoria {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator="sequence_categorias")
 	private Long codigo;
 	
-	@NotNull
+	@NotBlank
 	private String nome;
 	
 	public Long getCodigo() {
