@@ -1,5 +1,8 @@
 package br.com.inforio.repository.transacao;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,5 +14,10 @@ public interface TransacaoRepositoryQuery {
 
 	public Page<Transacao> pesquisar(TransacaoFilter filter, Pageable page);
 	public Page<ResumoTransacao> pesquisarResumido(TransacaoFilter filter, Pageable page);
+	public BigDecimal calcularTotalCreditoCarteiraNoAnoMes(int anoMes);
+	public BigDecimal calcularTotalDebitoCarteiraNoAnoMes(int anoMes);
+	public BigDecimal calcularTotalCreditoBancoNoAnoMes(int anoMes);
+	public BigDecimal calcularTotalDebitoBancoNoAnoMes(int anoMes);
+	public BigInteger buscarTotalTransacoesNoAnoMes(int anoMes);
 	 
 }

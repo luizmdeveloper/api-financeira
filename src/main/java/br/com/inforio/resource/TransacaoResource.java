@@ -87,4 +87,22 @@ public class TransacaoResource {
 	public void apagar(@PathVariable Long codigo) {
 		transacaoService.apagar(codigo);
 	}
+	
+	@GetMapping("quantidadeNoAnoMes/{anoMes}")
+	@PreAuthorize("#oauth2.hasScope('read')")
+	public ResponseEntity<?> quantidadeTransacoesNoAnoMes(@PathVariable int anoMes){
+		return ResponseEntity.ok(transacaoRepository.buscarTotalTransacoesNoAnoMes(anoMes));
+	}
+
+	@GetMapping("saldoCarteiroNoAnoMes/{anoMes}")
+	@PreAuthorize("#oauth2.hasScope('read')")
+	public ResponseEntity<?> buscarSaldoCarteira(@PathVariable int anoMes){
+		return ResponseEntity.ok(transacaoRepository.calcularTotalCreditoCarteiraNoAnoMes(anoMes).subtract(transacaoRepository.calcularTotalDebitoCarteiraNoAnoMes(anoMes)));
+	}
+
+	@GetMapping("saldoBancoNoAnoMes/{anoMes}")
+	@PreAuthorize("#oauth2.hasScope('read')")
+	public ResponseEntity<?> buscarSaldoBanco(@PathVariable int anoMes){
+		return ResponseEntity.ok(transacaoRepository.calcularTotalCreditoBancoNoAnoMes(anoMes).subtract(transacaoRepository.calcularTotalDebitoBancoNoAnoMes(anoMes)));
+	}	
 }
