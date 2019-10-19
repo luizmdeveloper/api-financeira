@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import br.com.inforio.modelo.TransacoesNoMesAno;
 import br.com.inforio.modelo.Transacao;
 import br.com.inforio.repository.TransacaoRepository;
 import br.com.inforio.service.exception.TransacaoNaoCadastradaException;
@@ -70,5 +71,13 @@ public class TransacaoService {
 			throw new TransacaoNaoCadastradaException();
 		}
 		return trancasao;
+	}
+
+	public TransacoesNoMesAno calcularTotais(int anoMes) {
+		TransacoesNoMesAno totais = new TransacoesNoMesAno();
+		totais.setQuantidadeTransacoes(transacaoRepository.buscarTotalTransacoesNoAnoMes(anoMes));
+		totais.setTotalCarteira(transacaoRepository.calcularTotalCreditoCarteiraNoAnoMes(anoMes).subtract(transacaoRepository.calcularTotalDebitoCarteiraNoAnoMes(anoMes)));
+		totais.setTotalBanco(transacaoRepository.calcularTotalCreditoBancoNoAnoMes(anoMes).subtract(transacaoRepository.calcularTotalDebitoBancoNoAnoMes(anoMes)));		
+		return totais;
 	}	
 }

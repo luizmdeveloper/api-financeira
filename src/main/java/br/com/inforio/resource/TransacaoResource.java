@@ -88,21 +88,15 @@ public class TransacaoResource {
 		transacaoService.apagar(codigo);
 	}
 	
-	@GetMapping("quantidadeNoAnoMes/{anoMes}")
+	@GetMapping("noMesAno/{anoMes}")
 	@PreAuthorize("#oauth2.hasScope('read')")
-	public ResponseEntity<?> quantidadeTransacoesNoAnoMes(@PathVariable int anoMes){
-		return ResponseEntity.ok(transacaoRepository.buscarTotalTransacoesNoAnoMes(anoMes));
+	public ResponseEntity<?> buscarTotaisTransacoes(@PathVariable int anoMes){		
+		return ResponseEntity.ok(transacaoService.calcularTotais(anoMes));
 	}
-
-	@GetMapping("saldoCarteiroNoAnoMes/{anoMes}")
+	
+	@GetMapping("porCategoria/{anoMes}")
 	@PreAuthorize("#oauth2.hasScope('read')")
-	public ResponseEntity<?> buscarSaldoCarteira(@PathVariable int anoMes){
-		return ResponseEntity.ok(transacaoRepository.calcularTotalCreditoCarteiraNoAnoMes(anoMes).subtract(transacaoRepository.calcularTotalDebitoCarteiraNoAnoMes(anoMes)));
+	public ResponseEntity<?> buscarGraficoCategoria(@PathVariable int anoMes){
+		return ResponseEntity.ok(transacaoRepository.calcularTransacoesPorCategoria(anoMes));
 	}
-
-	@GetMapping("saldoBancoNoAnoMes/{anoMes}")
-	@PreAuthorize("#oauth2.hasScope('read')")
-	public ResponseEntity<?> buscarSaldoBanco(@PathVariable int anoMes){
-		return ResponseEntity.ok(transacaoRepository.calcularTotalCreditoBancoNoAnoMes(anoMes).subtract(transacaoRepository.calcularTotalDebitoBancoNoAnoMes(anoMes)));
-	}	
 }

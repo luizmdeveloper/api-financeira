@@ -26,6 +26,7 @@ import br.com.inforio.modelo.Categoria_;
 import br.com.inforio.modelo.Conta_;
 import br.com.inforio.modelo.Transacao;
 import br.com.inforio.modelo.Transacao_;
+import br.com.inforio.modelo.TransacaoPorCategoria;
 import br.com.inforio.repository.filter.TransacaoFilter;
 import br.com.inforio.repository.projecao.ResumoTransacao;
 
@@ -75,7 +76,8 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
 						.setParameter(1, anoMes)
 						.setParameter(2, "C")
-						.setParameter(3, false);
+						.setParameter(3, true)
+						.setParameter(4, false);
 		
 		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);		
@@ -86,7 +88,8 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
 						.setParameter(1, anoMes)
 						.setParameter(2, "D")
-						.setParameter(3, false);
+						.setParameter(3, true)
+						.setParameter(4, false);
 		
 		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);		
@@ -97,7 +100,8 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
 				.setParameter(1, anoMes)
 				.setParameter(2, "C")
-				.setParameter(3, true);
+				.setParameter(3, true)
+				.setParameter(4, true);
 
 		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);		
@@ -108,7 +112,8 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
 				.setParameter(1, anoMes)
 				.setParameter(2, "D")
-				.setParameter(3, true);
+				.setParameter(3, true)
+				.setParameter(4, true);
 
 		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);	
@@ -122,14 +127,25 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 								.getSingleResult();
 	}	
 	
-	public String retornarSQLCalculoSaldoConta() {
-		return " SELECT SUM(transacoes.valor) FROM transacoes " +
-			   " LEFT OUTER JOIN contas ON contas.codigo = transacoes.codigo_conta " + 
-			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? " +
-			   "   AND transacoes.tipo = ? " +
-			   "   AND contas.banco = ? ";
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TransacaoPorCategoria> calcularTransacoesPorCategoria(int anoMes) {
+		List<TransacaoPorCategoria> transacoesPorCategoria = new ArrayList<>();
+		Query query = manager.createNativeQuery(retornarSQLGraficoCategoria())
+								.setParameter(1, anoMes);
+		
+		List<Object[]> resultado = query.getResultList();
+		
+		for(Object[] coluna: resultado) {
+			TransacaoPorCategoria transacaoPorCategoria = new TransacaoPorCategoria();
+			transacaoPorCategoria.setCategoria(coluna[0].toString());
+			transacaoPorCategoria.setPercentual(coluna[1] == "" || coluna[1] == null ? BigDecimal.ZERO : new BigDecimal(coluna[1].toString()));
+			transacoesPorCategoria.add(transacaoPorCategoria);
+		}
+		
+		return transacoesPorCategoria;
 	}
-	
+
 	private Predicate[] criarRestricoes(TransacaoFilter filter, CriteriaBuilder criteriaBuilder, Root<Transacao> root) {
 		List<Predicate> predicates = new ArrayList<>();
 		
@@ -177,5 +193,24 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		
 		criteria.select(builder.count(root));		
 		return manager.createQuery(criteria).getSingleResult();
+	}
+	
+	private String retornarSQLCalculoSaldoConta() {
+		return " SELECT SUM(transacoes.valor) FROM transacoes " +
+			   " LEFT OUTER JOIN contas ON contas.codigo = transacoes.codigo_conta " + 
+			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? " +
+			   "   AND transacoes.tipo = ? " +
+			   "   AND transacoes.conciliado = ? " +
+			   "   AND contas.banco = ? ";
+	}
+	
+	private String retornarSQLGraficoCategoria() {
+		return " SELECT categorias.nome, " + 
+			   "	   (((SELECT SUM(t.valor) FROM transacoes AS t " + 
+			   "	      WHERE t.codigo_categoria = transacoes.codigo_categoria) / " + 
+			   "	     (SELECT SUM(total.valor) FROM transacoes AS total)) * 100) " + 
+			   " FROM transacoes " + 
+			   " LEFT OUTER JOIN categorias ON categorias.codigo = transacoes.codigo_categoria " + 
+			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? ";
 	}
 }
