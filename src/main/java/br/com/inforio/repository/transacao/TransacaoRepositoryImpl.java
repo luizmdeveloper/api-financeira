@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,7 +24,6 @@ import org.springframework.util.StringUtils;
 
 import br.com.inforio.modelo.Categoria_;
 import br.com.inforio.modelo.Conta_;
-import br.com.inforio.modelo.TipoTransacao;
 import br.com.inforio.modelo.Transacao;
 import br.com.inforio.modelo.Transacao_;
 import br.com.inforio.repository.filter.TransacaoFilter;
@@ -71,66 +71,46 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 	}
 	
 	@Override
-	public BigDecimal calcularTotalCreditoCarteiraNoAnoMes(int anoMes) {		
-		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
-		CriteriaQuery<BigDecimal> criteria = criteriaBuilder.createQuery(BigDecimal.class);
-		Root<Transacao> root = criteria.from(Transacao.class);
-		root.join(Transacao_.conta);
-
-		Predicate[] predicates = criarRestricoesCalculoSaldo(criteriaBuilder, root, TipoTransacao.C, false); 
-		criteria.select(criteriaBuilder.sum(root.get(Transacao_.valor)));
-		criteria.where(predicates);
-		TypedQuery<BigDecimal> query = manager.createQuery(criteria);
+	public BigDecimal calcularTotalCreditoCarteiraNoAnoMes(int anoMes) {				
+		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
+						.setParameter(1, anoMes)
+						.setParameter(2, "C")
+						.setParameter(3, false);
 		
-		Optional<BigDecimal> optional = Optional.ofNullable(query.getSingleResult());
+		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);		
 	}
 
 	@Override
 	public BigDecimal calcularTotalDebitoCarteiraNoAnoMes(int anoMes) {
-		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
-		CriteriaQuery<BigDecimal> criteria = criteriaBuilder.createQuery(BigDecimal.class);
-		Root<Transacao> root = criteria.from(Transacao.class);
-		root.join(Transacao_.conta);
-
-		Predicate[] predicates = criarRestricoesCalculoSaldo(criteriaBuilder, root, TipoTransacao.D, false); 
-		criteria.select(criteriaBuilder.sum(root.get(Transacao_.valor)));
-		criteria.where(predicates);
-		TypedQuery<BigDecimal> query = manager.createQuery(criteria);
+		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
+						.setParameter(1, anoMes)
+						.setParameter(2, "D")
+						.setParameter(3, false);
 		
-		Optional<BigDecimal> optional = Optional.ofNullable(query.getSingleResult());
+		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);		
 	}
 	
 	@Override
 	public BigDecimal calcularTotalCreditoBancoNoAnoMes(int anoMes) {	
-		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
-		CriteriaQuery<BigDecimal> criteria = criteriaBuilder.createQuery(BigDecimal.class);
-		Root<Transacao> root = criteria.from(Transacao.class);
-		root.join(Transacao_.conta);
+		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
+				.setParameter(1, anoMes)
+				.setParameter(2, "C")
+				.setParameter(3, true);
 
-		Predicate[] predicates = criarRestricoesCalculoSaldo(criteriaBuilder, root, TipoTransacao.C, true); 
-		criteria.select(criteriaBuilder.sum(root.get(Transacao_.valor)));
-		criteria.where(predicates);
-		TypedQuery<BigDecimal> query = manager.createQuery(criteria);
-		
-		Optional<BigDecimal> optional = Optional.ofNullable(query.getSingleResult());
-		return optional.orElse(BigDecimal.ZERO);	
+		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
+		return optional.orElse(BigDecimal.ZERO);		
 	}
 
 	@Override
 	public BigDecimal calcularTotalDebitoBancoNoAnoMes(int anoMes) {
-		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
-		CriteriaQuery<BigDecimal> criteria = criteriaBuilder.createQuery(BigDecimal.class);
-		Root<Transacao> root = criteria.from(Transacao.class);
-		root.join(Transacao_.conta);
+		Query query = manager.createNativeQuery(retornarSQLCalculoSaldoConta())
+				.setParameter(1, anoMes)
+				.setParameter(2, "D")
+				.setParameter(3, true);
 
-		Predicate[] predicates = criarRestricoesCalculoSaldo(criteriaBuilder, root, TipoTransacao.D, true); 
-		criteria.select(criteriaBuilder.sum(root.get(Transacao_.valor)));
-		criteria.where(predicates);
-		TypedQuery<BigDecimal> query = manager.createQuery(criteria);
-		
-		Optional<BigDecimal> optional = Optional.ofNullable(query.getSingleResult());
+		Optional<BigDecimal> optional = Optional.ofNullable((BigDecimal) query.getSingleResult());
 		return optional.orElse(BigDecimal.ZERO);	
 	}
 		
@@ -141,7 +121,15 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 								.setParameter(1, anoMes)
 								.getSingleResult();
 	}	
-
+	
+	public String retornarSQLCalculoSaldoConta() {
+		return " SELECT SUM(transacoes.valor) FROM transacoes " +
+			   " LEFT OUTER JOIN contas ON contas.codigo = transacoes.codigo_conta " + 
+			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? " +
+			   "   AND transacoes.tipo = ? " +
+			   "   AND contas.banco = ? ";
+	}
+	
 	private Predicate[] criarRestricoes(TransacaoFilter filter, CriteriaBuilder criteriaBuilder, Root<Transacao> root) {
 		List<Predicate> predicates = new ArrayList<>();
 		
@@ -169,16 +157,6 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		
 		return predicates.toArray(new Predicate[predicates.size()]);
 	}
-	
-	private Predicate[] criarRestricoesCalculoSaldo(CriteriaBuilder criteriaBuilder, Root<Transacao> root, TipoTransacao tipo, boolean isBanco) {
-		List<Predicate> predicates = new ArrayList<>();
-		
-		predicates.add(criteriaBuilder.equal(root.get(Transacao_.conta).get(Conta_.banco), isBanco));
-		predicates.add(criteriaBuilder.equal(root.get(Transacao_.tipo), tipo));
-		
-		return predicates.toArray(new Predicate[predicates.size()]);
-	}
-
 	
 	private void adicionarRestricoesPaginacao(TypedQuery<?> query, Pageable page) {
 		int paginaAtual = page.getPageNumber();
