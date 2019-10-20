@@ -30,8 +30,7 @@ public class ContaRepositoryImpl implements ContaRepositoryQuery {
 		CriteriaBuilder criteriaBuilder = manager.getCriteriaBuilder();
 		CriteriaQuery<Conta> criteria = criteriaBuilder.createQuery(Conta.class);
 		Root<Conta> root = criteria.from(Conta.class);
-		
-		
+				
 		Predicate[] predicates = criarRestricoes(filter, criteriaBuilder, root); 
 		criteria.where(predicates);
 		TypedQuery<Conta> query = manager.createQuery(criteria);
@@ -54,11 +53,11 @@ public class ContaRepositoryImpl implements ContaRepositoryQuery {
 	
 	private void adicionarRestricoesPaginacao(TypedQuery<Conta> query, Pageable page) {
 		int paginaAtual = page.getPageNumber();
-		int primeiroRegistroDaPagina = page.getPageSize();
-		int totalRegistro = paginaAtual * primeiroRegistroDaPagina;
+		int totalRegistroPorPagina = page.getPageSize();
+		int primeiroRegistroDaPagina = paginaAtual * totalRegistroPorPagina;
 		
 		query.setFirstResult(primeiroRegistroDaPagina);
-		query.setMaxResults(totalRegistro);		
+		query.setMaxResults(totalRegistroPorPagina);	
 	}
 	
 	private Long calcularTotal(ContaFilter filter) {

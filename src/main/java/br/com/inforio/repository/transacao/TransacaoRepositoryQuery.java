@@ -22,5 +22,5 @@ public interface TransacaoRepositoryQuery {
 	public BigDecimal calcularTotalDebitoBancoNoAnoMes(int anoMes);
 	public BigInteger buscarTotalTransacoesNoAnoMes(int anoMes);
 	public List<TransacaoPorCategoria> calcularTransacoesPorCategoria(int anoMes);
-	 
+	
 }
