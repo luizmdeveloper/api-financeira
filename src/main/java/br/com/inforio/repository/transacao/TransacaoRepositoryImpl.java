@@ -24,9 +24,11 @@ import org.springframework.util.StringUtils;
 
 import br.com.inforio.modelo.Categoria_;
 import br.com.inforio.modelo.Conta_;
+import br.com.inforio.modelo.TotalTransacaoNoPeriodo;
 import br.com.inforio.modelo.Transacao;
-import br.com.inforio.modelo.Transacao_;
 import br.com.inforio.modelo.TransacaoPorCategoria;
+import br.com.inforio.modelo.Transacao_;
+import br.com.inforio.repository.filter.TotalTransacaoFilter;
 import br.com.inforio.repository.filter.TransacaoFilter;
 import br.com.inforio.repository.projecao.ResumoTransacao;
 
@@ -145,6 +147,25 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		
 		return transacoesPorCategoria;
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TotalTransacaoNoPeriodo> calcularTotalTransacaoNoIntervalo(TotalTransacaoFilter filter) {
+		List<TotalTransacaoNoPeriodo> totaisTransacao = new ArrayList<TotalTransacaoNoPeriodo>();
+		
+		Query query = manager.createNativeQuery(retornarSQLGraficoPeriodo())
+								.setParameter(1, filter.getAnoMesInicial())
+								.setParameter(2, filter.getAnoMesFinal());
+		
+		List<Object[]> resultado = query.getResultList();
+		
+		for(Object[] coluna: resultado) {
+			TotalTransacaoNoPeriodo totalTransacao = new TotalTransacaoNoPeriodo(((Double) coluna[0]), coluna[1].toString(), (BigDecimal)coluna[2]);
+			totaisTransacao.add(totalTransacao);
+		}
+				
+		return totaisTransacao;
+	}
 
 	private Predicate[] criarRestricoes(TransacaoFilter filter, CriteriaBuilder criteriaBuilder, Root<Transacao> root) {
 		List<Predicate> predicates = new ArrayList<>();
@@ -212,5 +233,14 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 			   " FROM transacoes " + 
 			   " LEFT OUTER JOIN categorias ON categorias.codigo = transacoes.codigo_categoria " + 
 			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? ";
+	}
+	
+	private String retornarSQLGraficoPeriodo() {
+		return " SELECT (EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao) AS ano_mes, " + 
+			   "	   tipo, " + 
+			   "	   SUM(valor) " + 
+			   " FROM public.transacoes " + 
+			   " WHERE (EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao) BETWEEN ? AND ?" + 
+			   " GROUP BY ano_mes, tipo ";
 	}
 }
