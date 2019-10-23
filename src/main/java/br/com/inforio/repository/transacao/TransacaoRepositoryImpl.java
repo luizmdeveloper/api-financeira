@@ -140,8 +140,8 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 		
 		for(Object[] coluna: resultado) {
 			TransacaoPorCategoria transacaoPorCategoria = new TransacaoPorCategoria();
-			transacaoPorCategoria.setCategoria(coluna[0].toString());
-			transacaoPorCategoria.setPercentual(coluna[1] == "" || coluna[1] == null ? BigDecimal.ZERO : new BigDecimal(coluna[1].toString()));
+			transacaoPorCategoria.setCategoria(coluna[1].toString());
+			transacaoPorCategoria.setPercentual(coluna[2] == "" || coluna[2] == null ? BigDecimal.ZERO : new BigDecimal(coluna[2].toString()));
 			transacoesPorCategoria.add(transacaoPorCategoria);
 		}
 		
@@ -226,13 +226,15 @@ public class TransacaoRepositoryImpl implements TransacaoRepositoryQuery {
 	}
 	
 	private String retornarSQLGraficoCategoria() {
-		return " SELECT categorias.nome, " + 
+		return " SELECT transacoes.codigo_categoria, " +
+			   " 		categorias.nome, " + 
 			   "	   (((SELECT SUM(t.valor) FROM transacoes AS t " + 
 			   "	      WHERE t.codigo_categoria = transacoes.codigo_categoria) / " + 
 			   "	     (SELECT SUM(total.valor) FROM transacoes AS total)) * 100) " + 
 			   " FROM transacoes " + 
 			   " LEFT OUTER JOIN categorias ON categorias.codigo = transacoes.codigo_categoria " + 
-			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? ";
+			   " WHERE ((EXTRACT(YEAR FROM transacoes.data_emissao) * 100) + EXTRACT(MONTH FROM transacoes.data_emissao)) = ? " + 
+			   " GROUP BY transacoes.codigo_categoria, categorias.nome ";
 	}
 	
 	private String retornarSQLGraficoPeriodo() {
