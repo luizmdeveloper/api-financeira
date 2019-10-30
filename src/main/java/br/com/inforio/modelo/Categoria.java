@@ -7,10 +7,12 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name="categorias")
+@DynamicUpdate
 public class Categoria {
 	
 	@Id

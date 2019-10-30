@@ -8,10 +8,12 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name = "contas")
+@DynamicUpdate
 public class Conta {
 
 	@Id
@@ -43,7 +45,7 @@ public class Conta {
 		this.nome = nome;
 	}
 
-	public Boolean isBanco() {
+	public Boolean getBanco() {
 		return banco;
 	}
 
